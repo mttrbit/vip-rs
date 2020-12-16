@@ -23,5 +23,5 @@ let user = "your.email%40example.com";
 let request_id = "yOur12343rEquEstIDHerE";
 let header_referer = "https:://subdomain.example.com";
 
-let response = fetch_security_code::<CodeResponse>(user, request_id, header_referer);
+let response: CodeResponse = fetch_security_code(user, request_id, header_referer);
 ```
