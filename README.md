@@ -17,7 +17,7 @@ Vip is built with Rust 1.48.
 
 
 ```rust,ignore
-use vip::{CodeResponse, fetch_security_code};
+use vip::vip::fetch_security_code;
 
 let user = "your.email%40example.com";
 let request_id = "yOur12343rEquEstIDHerE";
