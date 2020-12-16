@@ -18,7 +18,7 @@
 //! Add the following to your `Cargo.toml` file:
 //! ```toml
 //! [dependencies]
-//! vip = 0.1.0
+//! vip = { git = "https://github.com/mttrbit/vip-rs", branch = "main"}
 //! ```
 extern crate reqwest;
 extern crate serde;
