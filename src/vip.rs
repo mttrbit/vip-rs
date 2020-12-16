@@ -89,20 +89,20 @@ struct CheckPushNotification {
 
 #[derive(Deserialize, Debug)]
 pub struct CodeResponse {
-    success: bool,
-    ret: Payload,
+    pub success: bool,
+    pub ret: Payload,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Payload {
     #[serde(rename = "credData")]
-    cred_data: Option<String>,
+    pub cred_data: Option<String>,
     #[serde(rename = "credId")]
-    cred_id: Option<String>,
-    status: u64,
+    pub cred_id: Option<String>,
+    pub status: u64,
     #[serde(rename = "statusMsg")]
-    status_msg: String,
-    ticket: String,
+    pub status_msg: String,
+    pub ticket: String,
 }
 
 pub fn fetch_security_code(
