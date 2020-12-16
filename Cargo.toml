@@ -1,0 +1,16 @@
+[package]
+name = "vip"
+version = "0.1.0"
+authors = ["Sebastian Kaiser <sk4is3r@gmail.com>"]
+edition = "2018"
+homepage = "https://github.com/mttrbit/vip-rs"
+repository = "https://github.com/mttrbit/vip-rs.git"
+description = "Vip is a Rust library for the Symantec VIP API."
+keywords = ["symantec", "vip", "api"]
+readme = "README.md"
+license = "ISC"
+
+[dependencies]
+reqwest = { version = "0.10.8", features = ["blocking", "cookies", "stream", "json"]}
+serde_json = "1.0.59"
+serde = { version = "1.0", features = ["derive"] }
