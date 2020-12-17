@@ -188,14 +188,16 @@ pub fn fetch_security_code(
             println!("Please enter a security code: ");
             let mut ticket = String::new();
             let _ = std::io::stdin().read_line(&mut ticket)?;
+            ticket = ticket.trim_end_matches(|c| c == '\n').to_string();
             request_security_code(user, request_id, &ticket)
         }
 
-        _ => {
-            let transaction_id = create_push_notification.txn_id;
-            wait_for_confirmation(&transaction_id.unwrap())
-                .and_then(|res| fetch_security_code(&res))
-        }
+        _ => match create_push_notification.txn_id {
+            Some(txn_id) => {
+                wait_for_confirmation(&txn_id).and_then(|res| fetch_security_code(&res))
+            }
+            None => Err("TransactionId is missing!".into()),
+        },
     }
 }
 
