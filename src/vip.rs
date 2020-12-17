@@ -105,11 +105,7 @@ pub struct Payload {
     pub ticket: String,
 }
 
-pub fn fetch_security_code(
-    user: &str,
-    request_id: &str,
-    referer: &'static str,
-) -> Result<CodeResponse> {
+pub fn fetch_security_code(user: &str, request_id: &str, referer: &str) -> Result<CodeResponse> {
     let _ = vip_api::<GetGroupCredentialsResponse>(
         "vipuserservices/resources/getGroupCredentials",
         referer,
