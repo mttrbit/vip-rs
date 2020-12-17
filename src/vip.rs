@@ -63,11 +63,11 @@ struct Threshold {
 #[derive(Deserialize, Debug)]
 struct CreatePushNotificationResponse {
     #[serde(rename = "pushTo")]
-    push_to: Vec<PushTo>,
+    push_to: Option<Vec<PushTo>>,
     #[serde(rename = "rdBlocked")]
-    rd_blocked: bool,
+    rd_blocked: Option<bool>,
     #[serde(rename = "txnId")]
-    txn_id: String,
+    txn_id: Option<String>,
     #[serde(rename = "type")]
     type_name: String,
 }
@@ -154,11 +154,11 @@ pub fn fetch_security_code(
         Ok(response)
     };
 
-    let fetch_security_code = |notification: &CheckPushNotification| -> Result<CodeResponse> {
-        match notification.type_name.clone().as_str() {
-            "ticket" => {
-                let ticket = notification.ticket.as_ref().unwrap();
-                vip_api(
+    let request_security_code = |user: &str,
+                                 request_id: &str,
+                                 ticket: &str|
+     -> Result<CodeResponse> {
+        vip_api(
                     "vipuserservices/resources/provsctickets",
                 referer,
                     &format!(
@@ -171,17 +171,34 @@ pub fn fetch_security_code(
                         "null"
                     )
                 )
+    };
+
+    let fetch_security_code = |notification: &CheckPushNotification| -> Result<CodeResponse> {
+        match notification.type_name.clone().as_str() {
+            "ticket" => {
+                let ticket = notification.ticket.as_ref().unwrap();
+                request_security_code(user, request_id, ticket)
             }
-            "can-not-push" => Err("You need to send a code".into()),
             _ => Err(format!("state unknwon {:?}", notification.type_name).into()),
         }
     };
 
-    let transaction_id = create_push_notification.txn_id;
-    let security_code_response =
-        wait_for_confirmation(&transaction_id).and_then(|res| fetch_security_code(&res));
+    match create_push_notification.type_name.as_str() {
+        "can-not-push" => {
+            println!("Please enter a security code: ");
+            let mut ticket = String::new();
+            let _ = std::io::stdin().read_line(&mut ticket)?;
+            ticket = ticket.trim_end_matches(|c| c == '\n').to_string();
+            request_security_code(user, request_id, &ticket)
+        }
 
-    security_code_response
+        _ => match create_push_notification.txn_id {
+            Some(txn_id) => {
+                wait_for_confirmation(&txn_id).and_then(|res| fetch_security_code(&res))
+            }
+            None => Err("TransactionId is missing!".into()),
+        },
+    }
 }
 
 fn vip_api<T: DeserializeOwned>(endpoint: &str, referer: &'static str, body: &str) -> Result<T> {
