@@ -155,10 +155,8 @@ pub fn fetch_security_code(
     };
 
     let fetch_security_code = |notification: &CheckPushNotification| -> Result<CodeResponse> {
-        match notification.type_name.clone().as_str() {
-            "ticket" => {
-                let ticket = notification.ticket.as_ref().unwrap();
-                vip_api(
+        let send_request = |user: &str, request_id: &str, ticket: &str| -> Result<CodeResponse> {
+            vip_api(
                     "vipuserservices/resources/provsctickets",
                 referer,
                     &format!(
@@ -171,8 +169,19 @@ pub fn fetch_security_code(
                         "null"
                     )
                 )
+        };
+
+        match notification.type_name.clone().as_str() {
+            "ticket" => {
+                let ticket = notification.ticket.as_ref().unwrap();
+                send_request(user, request_id, ticket)
             }
-            "can-not-push" => Err("You need to send a code".into()),
+            "can-not-push" => {
+                println!("Please enter a security code: ");
+                let mut ticket = String::new();
+                let _ = std::io::stdin().read_line(&mut ticket)?;
+                send_request(user, request_id, &ticket)
+            }
             _ => Err(format!("state unknwon {:?}", notification.type_name).into()),
         }
     };
