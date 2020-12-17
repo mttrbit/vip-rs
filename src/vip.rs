@@ -201,7 +201,7 @@ pub fn fetch_security_code(
     }
 }
 
-fn vip_api<T: DeserializeOwned>(endpoint: &str, referer: &'static str, body: &str) -> Result<T> {
+fn vip_api<T: DeserializeOwned>(endpoint: &str, referer: &str, body: &str) -> Result<T> {
     let client = Client::new()
         .post(&format!(
             "https://userservices.vip.symantec.com/{}",
@@ -213,7 +213,10 @@ fn vip_api<T: DeserializeOwned>(endpoint: &str, referer: &'static str, body: &st
                 "Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0",
             ),
         )
-        .header(REFERER, HeaderValue::from_static(referer));
+        .header(
+            REFERER,
+            HeaderValue::from_bytes(&referer.as_bytes().to_vec())?,
+        );
     let response = client.body(body.to_string()).send()?;
     Ok(response.json()?)
 }
